@@ -6,29 +6,34 @@ export const config = {
 
 export default async function handler(req) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams, hash } = new URL(req.url);
     
-    // 비브르챗 필터를 우회하기 위해 주소창에서 언더바로 넘어온 데이터들을 파싱합니다.
-    const name = searchParams.get('name') || '유저';
-    const race = searchParams.get('race') || '인간';
-    const level = searchParams.get('level') || '0';
-    const familia = searchParams.get('familia') || '소속 패밀리아 없음';
-    const mind = searchParams.get('mind') || '0 / 0';
-    const str = searchParams.get('str') || '- 0';
-    const end = searchParams.get('end') || '- 0';
-    const dex = searchParams.get('dex') || '- 0';
-    const agi = searchParams.get('agi') || '- 0';
-    const mag = searchParams.get('mag') || '- 0';
-    const tStr = searchParams.get('tStr') || '0';
-    const tEnd = searchParams.get('tEnd') || '0';
-    const tDex = searchParams.get('tDex') || '0';
-    const tAgi = searchParams.get('tAgi') || '0';
-    const tMag = searchParams.get('tMag') || '0';
-    const ability = searchParams.get('ability') || '획득한 어빌리티 없음';
-    const magic = searchParams.get('magic') || '발현된 마법 없음';
-    const skill = searchParams.get('skill') || '발현된 스킬 없음';
+    // 비브르챗 AI가 해시(#) 뒤에 임의로 붙여올 변수값들까지 완벽하게 통합하여 추출합니다.
+    let targetParams = searchParams;
+    if (!searchParams.has('name') && hash) {
+      const cleanHash = hash.replace(/^#\/?/, '').replace(/^\?/, '');
+      targetParams = new URLSearchParams(cleanHash);
+    }
 
-    // 화면 출력 시 주소창의 언더바(_)를 다시 보기 좋은 공백이나 쉼표로 복원합니다.
+    const name = targetParams.get('name') || req.headers.get('x-name') || '유저';
+    const race = targetParams.get('race') || '인간';
+    const level = targetParams.get('level') || '0';
+    const familia = targetParams.get('familia') || '소속 패밀리아 없음';
+    const mind = targetParams.get('mind') || '0 / 0';
+    const str = targetParams.get('str') || '- 0';
+    const end = targetParams.get('end') || '- 0';
+    const dex = targetParams.get('dex') || '- 0';
+    const agi = targetParams.get('agi') || '- 0';
+    const mag = targetParams.get('mag') || '- 0';
+    const tStr = targetParams.get('tStr') || '0';
+    const tEnd = targetParams.get('tEnd') || '0';
+    const tDex = targetParams.get('tDex') || '0';
+    const tAgi = targetParams.get('tAgi') || '0';
+    const tMag = targetParams.get('tMag') || '0';
+    const ability = targetParams.get('ability') || '획득한 어빌리티 없음';
+    const magic = targetParams.get('magic') || '발현된 마법 없음';
+    const skill = targetParams.get('skill') || '발현된 스킬 없음';
+
     const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
     const dName = decodeURIComponent(name).replace(/_/g, ' ');
     const dRace = decodeURIComponent(race).replace(/_/g, ' ');
@@ -69,7 +74,7 @@ export default async function handler(req) {
                 <span style={{ width: '150px', textAlign: 'center' }}>현재 랭크 / 수치</span>
                 <span style={{ width: '120px', textAlign: 'right' }}>통합 누적 수치</span>
               </div>
-              <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginBottom: '10px' }} />
+              <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginTop: '5px', marginBottom: '10px' }} />
               {[
                 { label: '힘', val: dStr, total: tStr },
                 { label: '내구', val: dEnd, total: tEnd },
