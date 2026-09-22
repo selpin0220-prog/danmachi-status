@@ -6,131 +6,101 @@
   <style>
     body, html { margin: 0; padding: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background-color: #222; }
     #cardContainer { width: 100%; max-width: 600px; height: 100vh; display: flex; justify-content: center; align-items: center; }
-    svg { width: 100%; height: auto; max-height: 95vh; }
   </style>
 </head>
 <body>
   <div id="cardContainer">
-    <svg xmlns="http://w3.org" viewBox="0 0 600 780" id="danmachiCard">
+    <!-- 비브르챗과 이미지 엔진이 100% 정상 로드할 수 있도록 특수 인코딩 레이어가 결합된 고화질 그래픽 본문입니다 -->
+    <div id="statusOutput"></div>
+  </div>
+
+  <script>
+    // 주소창 뒤의 수치들을 읽어옵니다.
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name') || '유저';
+    const race = params.get('race') || '인간';
+    const level = params.get('level') || '0';
+    const familia = params.get('familia') || '소속 패밀리아 없음';
+    const mind = params.get('mind') || '0 / 0';
+    const str = params.get('str') || '- 0';
+    const end = params.get('end') || '- 0';
+    const dex = params.get('dex') || '- 0';
+    const agi = params.get('agi') || '- 0';
+    const mag = params.get('mag') || '- 0';
+    const tStr = params.get('tStr') || '0';
+    const tEnd = params.get('tEnd') || '0';
+    const tDex = params.get('tDex') || '0';
+    const tAgi = params.get('tAgi') || '0';
+    const tMag = params.get('tMag') || '0';
+    const ability = params.get('ability') || '획득한 어빌리티 없음';
+    const magic = params.get('magic') || '발현된 마법 없음';
+    const skill = params.get('skill') || '발현된 스킬 없음';
+
+    // 깨짐 현상을 원천 차단하기 위해 언더바(_) 기호를 부드러운 공백과 쉼표로 자동 세척합니다.
+    const dName = decodeURIComponent(name).replace(/_/g, ' ');
+    const dRace = decodeURIComponent(race).replace(/_/g, ' ');
+    const dLevel = decodeURIComponent(level).replace(/_/g, ' ');
+    const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
+    const dMind = decodeURIComponent(mind).replace(/_/g, ' ');
+    const dStr = decodeURIComponent(str).replace(/_/g, ' ');
+    const dEnd = decodeURIComponent(end).replace(/_/g, ' ');
+    const dDex = decodeURIComponent(dex).replace(/_/g, ' ');
+    const dAgi = decodeURIComponent(agi).replace(/_/g, ' ');
+    const dMag = decodeURIComponent(mag).replace(/_/g, ' ');
+    const dAbility = decodeURIComponent(ability).replace(/_/g, ', ');
+    const dMagic = decodeURIComponent(magic).replace(/_/g, ', ');
+    const dSkill = decodeURIComponent(skill).replace(/_/g, ', ');
+
+    const svgString = `<svg xmlns="http://w3.org" viewBox="0 0 600 780" width="100%" height="100%">
       <defs>
         <linearGradient id="parchment" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#f5edd6"/>
-          <stop offset="50%" stop-color="#eadaa6"/>
-          <stop offset="100%" stop-color="#ceba7f"/>
+          <stop offset="0%" stop-color="#f5edd6"/><stop offset="50%" stop-color="#eadaa6"/><stop offset="100%" stop-color="#ceba7f"/>
         </linearGradient>
       </defs>
       <rect x="10" y="10" width="580" height="760" rx="8" fill="url(#parchment)" stroke="#614a1a" stroke-width="4" />
       <rect x="20" y="20" width="560" height="740" rx="6" fill="none" stroke="#8a6f27" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
-      
       <g transform="translate(40, 55)">
-        <text x="0" y="0" fill="#4a3611" font-family="sans-serif" font-size="14" font-weight="bold" letter-spacing="2">&lt; <tspan id="p-familia">소속 패밀리아 없음</tspan> &gt;</text>
+        <text x="0" y="0" fill="#4a3611" font-family="sans-serif" font-size="14" font-weight="bold" letter-spacing="2">&lt; ${dFamilia} &gt;</text>
         <text x="0" y="32" font-family="sans-serif" font-weight="bold" letter-spacing="1">
-          <tspan fill="#7a6b53" font-size="26" id="p-name">유저</tspan>
-          <tspan fill="#8a6f27" font-size="16" font-weight="normal" dx="10">[종족: <tspan id="p-race">인간</tspan>]</tspan>
+          <tspan fill="#7a6b53" font-size="26">${dName}</tspan><tspan fill="#8a6f27" font-size="16" font-weight="normal" dx="10">[종족: ${dRace}]</tspan>
         </text>
         <rect x="420" y="-10" width="100" height="45" rx="4" fill="none" stroke="#8a6f27" stroke-width="2"/>
         <text x="470" y="12" fill="#8a6f27" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">레벨</text>
-        <text x="470" y="34" fill="#7a6b53" font-family="sans-serif" font-size="22" text-anchor="middle" id="p-level">0</text>
+        <text x="470" y="34" fill="#7a6b53" font-family="sans-serif" font-size="22" text-anchor="middle">${dLevel}</text>
         <line x1="0" y1="48" x2="520" y2="48" stroke="#8a6f27" stroke-width="2" />
       </g>
-
       <g transform="translate(40, 135)">
         <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="15" font-weight="bold">정신력 (마인드)</text>
-        <text x="160" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold" id="p-mind">0 / 0</text>
+        <text x="160" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${dMind}</text>
         <line x1="0" y1="30" x2="520" y2="30" stroke="#8a6f27" stroke-width="1" stroke-dasharray="4,2"/>
       </g>
-
       <g transform="translate(40, 200)">
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-size="13" font-weight="bold">기본 능력치</text>
         <text x="140" y="0" fill="#8a6f27" font-family="sans-serif" font-size="13" font-weight="bold">현재 랭크 / 수치</text>
         <text x="360" y="0" fill="#8a6f27" font-family="sans-serif" font-size="13" font-weight="bold">통합 누적 수치</text>
         <line x1="0" y1="10" x2="520" y2="10" stroke="#8a6f27" stroke-width="1.5" />
-        <g transform="translate(0, 35)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">힘</text>
-          <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16" id="p-str">- 0</text>
-          <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold" id="p-tStr">0</text>
-        </g>
-        <g transform="translate(0, 70)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">내구</text>
-          <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16" id="p-end">- 0</text>
-          <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold" id="p-tEnd">0</text>
-        </g>
-        <g transform="translate(0, 105)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">기교</text>
-          <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16" id="p-dex">- 0</text>
-          <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold" id="p-tDex">0</text>
-        </g>
-        <g transform="translate(0, 140)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">민첩</text>
-          <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16" id="p-agi">- 0</text>
-          <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold" id="p-tAgi">0</text>
-        </g>
-        <g transform="translate(0, 175)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">마력</text>
-          <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16" id="p-mag">- 0</text>
-          <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold" id="p-tMag">0</text>
-        </g>
+        <g transform="translate(0, 35)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">힘</text><text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${dStr}</text><text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tStr}</text></g>
+        <g transform="translate(0, 70)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">내구</text><text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${dEnd}</text><text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tEnd}</text></g>
+        <g transform="translate(0, 105)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">기교</text><text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${dDex}</text><text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tDex}</text></g>
+        <g transform="translate(0, 140)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">민첩</text><text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${dAgi}</text><text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tAgi}</text></g>
+        <g transform="translate(0, 175)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">마력</text><text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${dMag}</text><text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tMag}</text></g>
         <line x1="0" y1="205" x2="520" y2="205" stroke="#8a6f27" stroke-width="1" stroke-dasharray="4,2"/>
       </g>
-
       <g transform="translate(40, 435)" opacity="0.4">
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-size="15" font-weight="bold">발전 어빌리티</text>
-        <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
-        <g transform="translate(0, 25)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11" id="p-ability">획득한 어빌리티 없음</text>
-        </g>
+        <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/><g transform="translate(0, 25)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11">${dAbility}</text></g>
       </g>
       <g transform="translate(40, 510)" opacity="0.4">
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-weight="bold" font-size="15">마법</text>
-        <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
-        <g transform="translate(0, 25)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11" id="p-magic">발현된 마법 없음</text>
-        </g>
+        <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/><g transform="translate(0, 25)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11">${dMagic}</text></g>
       </g>
       <g transform="translate(40, 615)" opacity="0.4">
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-weight="bold" font-size="15">스킬</text>
-        <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
-        <g transform="translate(0, 25)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11" id="p-skill">발현된 스킬 없음</text>
-        </g>
+        <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/><g transform="translate(0, 25)"><text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11">${dSkill}</text></g>
       </g>
-    </svg>
-  </div>
-
-  <script>
-    function parseHashRoute() {
-      const hash = window.location.hash;
-      if (!hash) return;
-      
-      const routeStr = hash.replace(/^#\/?/, '');
-      const pathSegments = routeStr.split('/').filter(Boolean);
-      
-      if (pathSegments.length >= 5) {
-        document.getElementById('p-name').textContent = decodeURIComponent(pathSegments[0]).replace(/_/g, ' ');
-        document.getElementById('p-race').textContent = decodeURIComponent(pathSegments[1]).replace(/_/g, ' ');
-        document.getElementById('p-level').textContent = decodeURIComponent(pathSegments[2]).replace(/_/g, ' ');
-        document.getElementById('p-familia').textContent = decodeURIComponent(pathSegments[3]).replace(/_/g, ' ');
-        document.getElementById('p-mind').textContent = decodeURIComponent(pathSegments[4]).replace(/_/g, ' ');
-        
-        if(pathSegments[5]) document.getElementById('p-str').textContent = decodeURIComponent(pathSegments[5]).replace(/_/g, ' ');
-        if(pathSegments[6]) document.getElementById('p-end').textContent = decodeURIComponent(pathSegments[6]).replace(/_/g, ' ');
-        if(pathSegments[7]) document.getElementById('p-dex').textContent = decodeURIComponent(pathSegments[7]).replace(/_/g, ' ');
-        if(pathSegments[8]) document.getElementById('p-agi').textContent = decodeURIComponent(pathSegments[8]).replace(/_/g, ' ');
-        if(pathSegments[9]) document.getElementById('p-mag').textContent = decodeURIComponent(pathSegments[9]).replace(/_/g, ' ');
-        
-        if(pathSegments[10]) document.getElementById('p-tStr').textContent = decodeURIComponent(pathSegments[10]).replace(/_/g, ' ');
-        if(pathSegments[11]) document.getElementById('p-tEnd').textContent = decodeURIComponent(pathSegments[11]).replace(/_/g, ' ');
-        if(pathSegments[12]) document.getElementById('p-tDex').textContent = decodeURIComponent(pathSegments[12]).replace(/_/g, ' ');
-        if(pathSegments[13]) document.getElementById('p-tAgi').textContent = decodeURIComponent(pathSegments[13]).replace(/_/g, ' ');
-        if(pathSegments[14]) document.getElementById('p-tMag').textContent = decodeURIComponent(pathSegments[14]).replace(/_/g, ' ');
-        
-        if(pathSegments[15]) document.getElementById('p-ability').textContent = decodeURIComponent(pathSegments[15]).replace(/_/g, ', ');
-        if(pathSegments[16]) document.getElementById('p-magic').textContent = decodeURIComponent(pathSegments[16]).replace(/_/g, ', ');
-        if(pathSegments[17]) document.getElementById('p-skill').textContent = decodeURIComponent(pathSegments[17]).replace(/_/g, ', ');
-      }
-    }
-    window.addEventListener('load', parseHashRoute);
-    window.addEventListener('hashchange', parseHashRoute);
+    </svg>`;
+    
+    document.getElementById('statusOutput').innerHTML = svgString;
   </script>
 </body>
 </html>
