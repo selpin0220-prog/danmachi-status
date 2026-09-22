@@ -77,64 +77,58 @@
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-size="15" font-weight="bold">발전 어빌리티</text>
         <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
         <g transform="translate(0, 25)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="14" id="p-ability">획득한 어빌리티 없음</text>
+          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11" id="p-ability">획득한 어빌리티 없음</text>
         </g>
       </g>
       <g transform="translate(40, 510)" opacity="0.4">
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-weight="bold" font-size="15">마법</text>
         <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
         <g transform="translate(0, 25)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="14" id="p-magic">발현된 마법 없음</text>
+          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11" id="p-magic">발현된 마법 없음</text>
         </g>
       </g>
       <g transform="translate(40, 615)" opacity="0.4">
         <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-weight="bold" font-size="15">스킬</text>
         <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
         <g transform="translate(0, 25)">
-          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="14" id="p-skill">발현된 스킬 없음</text>
+          <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="11" id="p-skill">발현된 스킬 없음</text>
         </g>
       </g>
     </svg>
   </div>
 
   <script>
-    // 해시태그 기반 슬래시 주소를 파싱하여 카드를 실시간 갱신하는 무적의 스크립트
     function parseHashRoute() {
       const hash = window.location.hash;
       if (!hash) return;
       
-      // #/ 부분을 떼어내고 슬래시로 쪼갭니다.
       const routeStr = hash.replace(/^#\/?/, '');
       const pathSegments = routeStr.split('/').filter(Boolean);
       
       if (pathSegments.length >= 5) {
-        document.getElementById('p-name').textContent = decodeURIComponent(pathSegments[0]);
-        document.getElementById('p-race').textContent = decodeURIComponent(pathSegments[1]);
-        document.getElementById('p-level').textContent = decodeURIComponent(pathSegments[2]);
-        document.getElementById('p-familia').textContent = decodeURIComponent(pathSegments[3]);
+        document.getElementById('p-name').textContent = decodeURIComponent(pathSegments[0]).replace(/_/g, ' ');
+        document.getElementById('p-race').textContent = decodeURIComponent(pathSegments[1]).replace(/_/g, ' ');
+        document.getElementById('p-level').textContent = decodeURIComponent(pathSegments[2]).replace(/_/g, ' ');
+        document.getElementById('p-familia').textContent = decodeURIComponent(pathSegments[3]).replace(/_/g, ' ');
+        document.getElementById('p-mind').textContent = decodeURIComponent(pathSegments[4]).replace(/_/g, ' ');
         
-        const currentMind = decodeURIComponent(pathSegments[4]);
-        const maxMind = decodeURIComponent(pathSegments[5]) || '10';
-        document.getElementById('p-mind').textContent = currentMind + " / " + maxMind;
+        if(pathSegments[5]) document.getElementById('p-str').textContent = decodeURIComponent(pathSegments[5]).replace(/_/g, ' ');
+        if(pathSegments[6]) document.getElementById('p-end').textContent = decodeURIComponent(pathSegments[6]).replace(/_/g, ' ');
+        if(pathSegments[7]) document.getElementById('p-dex').textContent = decodeURIComponent(pathSegments[7]).replace(/_/g, ' ');
+        if(pathSegments[8]) document.getElementById('p-agi').textContent = decodeURIComponent(pathSegments[8]).replace(/_/g, ' ');
+        if(pathSegments[9]) document.getElementById('p-mag').textContent = decodeURIComponent(pathSegments[9]).replace(/_/g, ' ');
         
-        if(pathSegments[6]) document.getElementById('p-str').textContent = decodeURIComponent(pathSegments[6]);
-        if(pathSegments[7]) document.getElementById('p-end').textContent = decodeURIComponent(pathSegments[7]);
-        if(pathSegments[8]) document.getElementById('p-dex').textContent = decodeURIComponent(pathSegments[8]);
-        if(pathSegments[9]) document.getElementById('p-agi').textContent = decodeURIComponent(pathSegments[9]);
-        if(pathSegments[10]) document.getElementById('p-mag').textContent = decodeURIComponent(pathSegments[10]);
+        if(pathSegments[10]) document.getElementById('p-tStr').textContent = decodeURIComponent(pathSegments[10]).replace(/_/g, ' ');
+        if(pathSegments[11]) document.getElementById('p-tEnd').textContent = decodeURIComponent(pathSegments[11]).replace(/_/g, ' ');
+        if(pathSegments[12]) document.getElementById('p-tDex').textContent = decodeURIComponent(pathSegments[12]).replace(/_/g, ' ');
+        if(pathSegments[13]) document.getElementById('p-tAgi').textContent = decodeURIComponent(pathSegments[13]).replace(/_/g, ' ');
+        if(pathSegments[14]) document.getElementById('p-tMag').textContent = decodeURIComponent(pathSegments[14]).replace(/_/g, ' ');
         
-        if(pathSegments[11]) document.getElementById('p-tStr').textContent = decodeURIComponent(pathSegments[11]);
-        if(pathSegments[12]) document.getElementById('p-tEnd').textContent = decodeURIComponent(pathSegments[12]);
-        if(pathSegments[13]) document.getElementById('p-tDex').textContent = decodeURIComponent(pathSegments[13]);
-        if(pathSegments[14]) document.getElementById('p-tAgi').textContent = decodeURIComponent(pathSegments[14]);
-        if(pathSegments[15]) document.getElementById('p-tMag').textContent = decodeURIComponent(pathSegments[15]);
-        
-        if(pathSegments[16]) document.getElementById('p-magic').textContent = decodeURIComponent(pathSegments[16]);
-        if(pathSegments[17]) document.getElementById('p-skill').textContent = decodeURIComponent(pathSegments[17]);
+        if(pathSegments[15]) document.getElementById('p-ability').textContent = decodeURIComponent(pathSegments[15]).replace(/_/g, ', ');
+        if(pathSegments[16]) document.getElementById('p-magic').textContent = decodeURIComponent(pathSegments[16]).replace(/_/g, ', ');
+        if(pathSegments[17]) document.getElementById('p-skill').textContent = decodeURIComponent(pathSegments[17]).replace(/_/g, ', ');
       }
     }
-    
-    // 페이지 로드 시점과 해시 값이 실시간으로 바뀔 때마다 감지하여 갱신합니다.
     window.addEventListener('load', parseHashRoute);
     window.addEventListener('hashchange', parseHashRoute);
   </script>
