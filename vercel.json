@@ -1,8 +1,8 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/hud",
-      "destination": "/api/status-card"
+      "src": "/(.*)",
+      "dest": "https://vercel.app"
     }
   ]
 }
