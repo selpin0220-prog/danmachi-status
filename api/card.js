@@ -1,116 +1,87 @@
-export default async function handler(req, res) {
-  // 비브르챗이 보낸 슬래시(/) 기반의 주소를 분해합니다.
-  // 주소창 예시: /api/card/이름/종족/레벨/패밀리아/현재마인드/최대마인드/힘/내구/기교/민첩/마력/누적힘/누적내구/누적기교/누적민첩/누적마력/마법/스킬/status.png
-  const { path } = req.query;
-  
-  // 주소를 슬래시 기준으로 쪼개어 배열로 만듭니다.
-  const params = path ? path.split('/') : [];
+import { ImageResponse } from '@vercel/og';
 
-  // 배열 순서대로 안전하게 값을 매칭하고, 값이 없으면 기본값을 씁니다.
-  const name = decodeURIComponent(params[0] || '유저');
-  const race = decodeURIComponent(params[1] || '인간');
-  const level = decodeURIComponent(params[2] || '0');
-  const familia = decodeURIComponent(params[3] || '소속 패밀리아 없음');
-  const mindCurrent = decodeURIComponent(params[4] || '0');
-  const mindMax = decodeURIComponent(params[5] || '0');
-  const str = decodeURIComponent(params[6] || '- 0');
-  const end = decodeURIComponent(params[7] || '- 0');
-  const dex = decodeURIComponent(params[8] || '- 0');
-  const agi = decodeURIComponent(params[9] || '- 0');
-  const mag = decodeURIComponent(params[10] || '- 0');
-  const tStr = decodeURIComponent(params[11] || '0');
-  const tEnd = decodeURIComponent(params[12] || '0');
-  const tDex = decodeURIComponent(params[13] || '0');
-  const tAgi = decodeURIComponent(params[14] || '0');
-  const tMag = decodeURIComponent(params[15] || '0');
-  const magic = decodeURIComponent(params[16] || '발현된 마법 없음');
-  const skill = decodeURIComponent(params[17] || '발현된 스킬 없음');
+export const config = {
+  runtime: 'edge',
+};
 
-  // SVG 양장본 카드 디자인 템플릿
-  const svg = `<svg xmlns="http://w3.org" viewBox="0 0 600 780" width="100%" height="100%">
-  <defs>
-    <linearGradient id="parchment" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f5edd6"/>
-      <stop offset="50%" stop-color="#eadaa6"/>
-      <stop offset="100%" stop-color="#ceba7f"/>
-    </linearGradient>
-  </defs>
-  <rect x="10" y="10" width="580" height="760" rx="8" fill="url(#parchment)" stroke="#614a1a" stroke-width="4" />
-  <rect x="20" y="20" width="560" height="740" rx="6" fill="none" stroke="#8a6f27" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
-  <g transform="translate(40, 55)">
-    <text x="0" y="0" fill="#4a3611" font-family="sans-serif" font-size="14" font-weight="bold" letter-spacing="2">&amp;lt; ${familia} &amp;gt;</text>
-    <text x="0" y="32" font-family="sans-serif" font-weight="bold" letter-spacing="1">
-      <tspan fill="#7a6b53" font-size="26">${name}</tspan>
-      <tspan fill="#8a6f27" font-size="16" font-weight="normal" dx="10">[종족: ${race}]</tspan>
-    </text>
-    <rect x="420" y="-10" width="100" height="45" rx="4" fill="none" stroke="#8a6f27" stroke-width="2"/>
-    <text x="470" y="12" fill="#8a6f27" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">레벨</text>
-    <text x="470" y="34" fill="#7a6b53" font-family="sans-serif" font-size="22" text-anchor="middle">${level}</text>
-    <line x1="0" y1="48" x2="520" y2="48" stroke="#8a6f27" stroke-width="2" />
-  </g>
-  <g transform="translate(40, 135)">
-    <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="15" font-weight="bold">정신력 (마인드)</text>
-    <text x="160" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${mindCurrent} / ${mindMax}</text>
-    <line x1="0" y1="30" x2="520" y2="30" stroke="#8a6f27" stroke-width="1" stroke-dasharray="4,2"/>
-  </g>
-  <g transform="translate(40, 200)">
-    <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-size="13" font-weight="bold">기본 능력치</text>
-    <text x="140" y="0" fill="#8a6f27" font-family="sans-serif" font-size="13" font-weight="bold">현재 랭크 / 수치</text>
-    <text x="360" y="0" fill="#8a6f27" font-family="sans-serif" font-size="13" font-weight="bold">통합 누적 수치</text>
-    <line x1="0" y1="10" x2="520" y2="10" stroke="#8a6f27" stroke-width="1.5" />
-    <g transform="translate(0, 35)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">힘</text>
-      <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${str}</text>
-      <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tStr}</text>
-    </g>
-    <g transform="translate(0, 70)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">내구</text>
-      <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${end}</text>
-      <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tEnd}</text>
-    </g>
-    <g transform="translate(0, 105)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">기교</text>
-      <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${dex}</text>
-      <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tDex}</text>
-    </g>
-    <g transform="translate(0, 140)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">민첩</text>
-      <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${agi}</text>
-      <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tAgi}</text>
-    </g>
-    <g transform="translate(0, 175)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="16" font-weight="bold">마력</text>
-      <text x="140" y="15" fill="#7a6b53" font-family="monospace" font-size="16">${mag}</text>
-      <text x="360" y="15" fill="#7a6b53" font-family="monospace" font-size="16" font-weight="bold">${tMag}</text>
-    </g>
-    <line x1="0" y1="205" x2="520" y2="205" stroke="#8a6f27" stroke-width="1" stroke-dasharray="4,2"/>
-  </g>
-  <g transform="translate(40, 435)" opacity="0.4">
-    <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-size="15" font-weight="bold">발전 어빌리티</text>
-    <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
-    <g transform="translate(0, 25)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="14">${magic}</text>
-    </g>
-  </g>
-  <g transform="translate(40, 510)" opacity="0.4">
-    <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-weight="bold" font-size="15">마법</text>
-    <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
-    <g transform="translate(0, 25)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="14">${magic}</text>
-    </g>
-  </g>
-  <g transform="translate(40, 615)" opacity="0.4">
-    <text x="0" y="0" fill="#8a6f27" font-family="sans-serif" font-weight="bold" font-size="15">스킬</text>
-    <line x1="0" y1="8" x2="520" y2="8" stroke="#8a6f27" stroke-width="1.5"/>
-    <g transform="translate(0, 25)">
-      <text x="0" y="15" fill="#7a6b53" font-family="sans-serif" font-size="14">${skill}</text>
-    </g>
-  </g>
-</svg>`;
+export default async function handler(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    
+    // 비브르챗 필터를 우회하기 위해 한글 파라미터를 안전하게 해독합니다.
+    const name = searchParams.get('name') || '유저';
+    const race = searchParams.get('race') || '인간';
+    const level = searchParams.get('level') || '0';
+    const familia = searchParams.get('familia') || '소속 패밀리아 없음';
+    const mind = searchParams.get('mind') || '0 / 0';
+    const str = searchParams.get('str') || '- 0';
+    const end = searchParams.get('end') || '- 0';
+    const dex = searchParams.get('dex') || '- 0';
+    const agi = searchParams.get('agi') || '- 0';
+    const mag = searchParams.get('mag') || '- 0';
+    const tStr = searchParams.get('tStr') || '0';
+    const tEnd = searchParams.get('tEnd') || '0';
+    const tDex = searchParams.get('tDex') || '0';
+    const tAgi = searchParams.get('tAgi') || '0';
+    const tMag = searchParams.get('tMag') || '0';
+    const ability = searchParams.get('ability') || '획득한 어빌리티 없음';
+    const magic = searchParams.get('magic') || '발현된 마법 없음';
+    const skill = searchParams.get('skill') || '발현된 스킬 없음';
 
-  // 비브르챗이 완벽한 고화질 이미지 파일로 강제 인식하도록 헤더 설정
-  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.status(200).send(svg);
+    return new ImageResponse(
+      (
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '40px', backgroundColor: '#222', justifyContent: 'center', alignHeight: 'center', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '520px', height: '700px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'sans-serif' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {familia} &gt;</span>
+              <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
+                <span style={{ fontSize: '26px', fontWeight: 'bold', color: '#7a6b53' }}>{name}</span>
+                <span style={{ fontSize: '16px', color: '#8a6f27', marginLeft: '10px' }}>[종족: {race}]</span>
+              </div>
+              <div style={{ position: 'absolute', right: '30px', top: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '80px', padding: '5px', border: '2px solid #8a6f27', borderRadius: '4px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#8a6f27' }}>레벨</span>
+                <span style={{ fontSize: '22px', fontWeight: 'bold', color: '#7a6b53', marginTop: '2px' }}>{level}</span>
+              </div>
+              <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginTop: '15px' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#7a6b53' }}>정신력 (마인드)</span>
+              <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53', fontFamily: 'monospace' }}>{mind}</span>
+            </div>
+            <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold', color: '#8a6f27', marginBottom: '5px' }}>
+                <span style={{ width: '100px' }}>기본 능력치</span>
+                <span style={{ width: '150px', textAlign: 'center' }}>현재 랭크 / 수치</span>
+                <span style={{ width: '120px', textAlign: 'right' }}>통합 누적 수치</span>
+              </div>
+              <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginBottom: '10px' }} />
+              {[
+                { label: '힘', val: str, total: tStr },
+                { label: '내구', val: end, total: tEnd },
+                { label: '기교', val: dex, total: tDex },
+                { label: '민첩', val: agi, total: tAgi },
+                { label: '마력', val: mag, total: tMag },
+              ].map((row, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', color: '#7a6b53', padding: '4px 0' }}>
+                  <span style={{ width: '100px', fontWeight: 'bold' }}>{row.label}</span>
+                  <span style={{ width: '150px', textAlign: 'center', fontFamily: 'monospace' }}>{row.val}</span>
+                  <span style={{ width: '120px', textAlign: 'right', fontWeight: 'bold', fontFamily: 'monospace' }}>{row.total}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', opacity: 0.8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{ability}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{magic}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 스킬</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{skill}</span></div>
+            </div>
+          </div>
+        </div>
+      ),
+      { width: 600, height: 780 }
+    );
+  } catch (e) {
+    return new Response(`Failed to generate image`, { status: 500 });
+  }
 }
