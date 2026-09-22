@@ -10,8 +10,7 @@
   </style>
 </head>
 <body>
-  <div id="cardContainer" id="svgTarget">
-    <!-- 이미지 출력을 보장하기 위해 특수 기호를 완벽하게 배제한 순수 SVG 데이터입니다 -->
+  <div id="cardContainer">
     <svg xmlns="http://w3.org" viewBox="0 0 600 780" id="danmachiCard">
       <defs>
         <linearGradient id="parchment" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -99,35 +98,45 @@
   </div>
 
   <script>
-    // 경로 기반 슬래시(/) 주소를 읽어오는 혁신적인 프론트엔드 파서
-    // 주소 예시: danmachi-status.vercel.app/이름/종족/레벨/패밀리아/현재마인드/최대마인드/힘/내구/기교/민첩/마력/누적힘/누적내구/누적기교/누적민첩/누적마력/마법/스킬
-    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-    
-    if (pathSegments.length >= 5) {
-      document.getElementById('p-name').textContent = decodeURIComponent(pathSegments[0]);
-      document.getElementById('p-race').textContent = decodeURIComponent(pathSegments[1]);
-      document.getElementById('p-level').textContent = decodeURIComponent(pathSegments[2]);
-      document.getElementById('p-familia').textContent = decodeURIComponent(pathSegments[3]);
+    // 해시태그 기반 슬래시 주소를 파싱하여 카드를 실시간 갱신하는 무적의 스크립트
+    function parseHashRoute() {
+      const hash = window.location.hash;
+      if (!hash) return;
       
-      const currentMind = decodeURIComponent(pathSegments[4]);
-      const maxMind = decodeURIComponent(pathSegments[5]) || '10';
-      document.getElementById('p-mind').textContent = currentMind + " / " + maxMind;
+      // #/ 부분을 떼어내고 슬래시로 쪼갭니다.
+      const routeStr = hash.replace(/^#\/?/, '');
+      const pathSegments = routeStr.split('/').filter(Boolean);
       
-      if(pathSegments[6]) document.getElementById('p-str').textContent = decodeURIComponent(pathSegments[6]);
-      if(pathSegments[7]) document.getElementById('p-end').textContent = decodeURIComponent(pathSegments[7]);
-      if(pathSegments[8]) document.getElementById('p-dex').textContent = decodeURIComponent(pathSegments[8]);
-      if(pathSegments[9]) document.getElementById('p-agi').textContent = decodeURIComponent(pathSegments[9]);
-      if(pathSegments[10]) document.getElementById('p-mag').textContent = decodeURIComponent(pathSegments[10]);
-      
-      if(pathSegments[11]) document.getElementById('p-tStr').textContent = decodeURIComponent(pathSegments[11]);
-      if(pathSegments[12]) document.getElementById('p-tEnd').textContent = decodeURIComponent(pathSegments[12]);
-      if(pathSegments[13]) document.getElementById('p-tDex').textContent = decodeURIComponent(pathSegments[13]);
-      if(pathSegments[14]) document.getElementById('p-tAgi').textContent = decodeURIComponent(pathSegments[14]);
-      if(pathSegments[15]) document.getElementById('p-tMag').textContent = decodeURIComponent(pathSegments[15]);
-      
-      if(pathSegments[16]) document.getElementById('p-magic').textContent = decodeURIComponent(pathSegments[16]);
-      if(pathSegments[17]) document.getElementById('p-skill').textContent = decodeURIComponent(pathSegments[17]);
+      if (pathSegments.length >= 5) {
+        document.getElementById('p-name').textContent = decodeURIComponent(pathSegments[0]);
+        document.getElementById('p-race').textContent = decodeURIComponent(pathSegments[1]);
+        document.getElementById('p-level').textContent = decodeURIComponent(pathSegments[2]);
+        document.getElementById('p-familia').textContent = decodeURIComponent(pathSegments[3]);
+        
+        const currentMind = decodeURIComponent(pathSegments[4]);
+        const maxMind = decodeURIComponent(pathSegments[5]) || '10';
+        document.getElementById('p-mind').textContent = currentMind + " / " + maxMind;
+        
+        if(pathSegments[6]) document.getElementById('p-str').textContent = decodeURIComponent(pathSegments[6]);
+        if(pathSegments[7]) document.getElementById('p-end').textContent = decodeURIComponent(pathSegments[7]);
+        if(pathSegments[8]) document.getElementById('p-dex').textContent = decodeURIComponent(pathSegments[8]);
+        if(pathSegments[9]) document.getElementById('p-agi').textContent = decodeURIComponent(pathSegments[9]);
+        if(pathSegments[10]) document.getElementById('p-mag').textContent = decodeURIComponent(pathSegments[10]);
+        
+        if(pathSegments[11]) document.getElementById('p-tStr').textContent = decodeURIComponent(pathSegments[11]);
+        if(pathSegments[12]) document.getElementById('p-tEnd').textContent = decodeURIComponent(pathSegments[12]);
+        if(pathSegments[13]) document.getElementById('p-tDex').textContent = decodeURIComponent(pathSegments[13]);
+        if(pathSegments[14]) document.getElementById('p-tAgi').textContent = decodeURIComponent(pathSegments[14]);
+        if(pathSegments[15]) document.getElementById('p-tMag').textContent = decodeURIComponent(pathSegments[15]);
+        
+        if(pathSegments[16]) document.getElementById('p-magic').textContent = decodeURIComponent(pathSegments[16]);
+        if(pathSegments[17]) document.getElementById('p-skill').textContent = decodeURIComponent(pathSegments[17]);
+      }
     }
+    
+    // 페이지 로드 시점과 해시 값이 실시간으로 바뀔 때마다 감지하여 갱신합니다.
+    window.addEventListener('load', parseHashRoute);
+    window.addEventListener('hashchange', parseHashRoute);
   </script>
 </body>
 </html>
