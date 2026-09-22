@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/status-card/:name/:race/:level/:familia/:mind/:str/:end/:dex/:agi/:mag/:tStr/:tEnd/:tDex/:tAgi/:tMag/:ability/:magic/:skill/card.png",
-      "destination": "/api/status-card?name=:name&race=:race&level=:level&familia=:familia&mind=:mind&str=:str&end=:end&decay=:dex&agi=:agi&mag=:mag&tStr=:tStr&tEnd=:tEnd&tDex=:tDex&tAgi=:tAgi&tMag=:tMag&ability=:ability&magic=:magic&skill=:skill"
+      "source": "/x",
+      "destination": "/api/status-card"
     }
   ]
 }
