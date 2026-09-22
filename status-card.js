@@ -4,11 +4,20 @@ export const config = {
   runtime: 'edge',
 };
 
+// 폰트 데이터를 가져오는 헬퍼 함수
+async function loadFont() {
+  // 예시로 원활한 한글 출력을 위해 Pretendard 폰트(이진 데이터)를 가져옵니다.
+  const res = await fetch(
+    new URL('https://jsdelivr.net')
+  );
+  if (!res.ok) throw new Error('Failed to load font');
+  return await res.arrayBuffer();
+}
+
 export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
     
-    // 바베챗 보안 필터를 우회하기 위해 슬래시 경로에서 자동 변환된 값들을 파싱합니다.
     const name = searchParams.get('name') || '유저';
     const race = searchParams.get('race') || '인간';
     const level = searchParams.get('level') || '0';
@@ -28,7 +37,6 @@ export default async function handler(req) {
     const magic = searchParams.get('magic') || '발현된 마법 없음';
     const skill = searchParams.get('skill') || '발현된 스킬 없음';
 
-    // 주소창의 언더바(_) 기호를 화면 출력 시 부드러운 공백과 쉼표로 자동 복원합니다.
     const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
     const dName = decodeURIComponent(name).replace(/_/g, ' ');
     const dRace = decodeURIComponent(race).replace(/_/g, ' ');
@@ -42,10 +50,14 @@ export default async function handler(req) {
     const dMagic = decodeURIComponent(magic).replace(/_/g, ', ');
     const dSkill = decodeURIComponent(skill).replace(/_/g, ', ');
 
+    // 폰트 로드
+    const fontData = await loadFont();
+
     return new ImageResponse(
       (
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '40px', backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', width: '520px', height: '700px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'sans-serif' }}>
+        // 채팅창 정렬을 위해 불필요한 바깥 회색 배경 제거 및 크기 맞춤
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '540px', height: '740px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'Pretendard' }}>
             {/* 상단 프로필 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {dFamilia} &gt;</span>
@@ -63,7 +75,7 @@ export default async function handler(req) {
             {/* 마인드 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#7a6b53' }}>정신력 (마인드)</span>
-              <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53', fontFamily: 'monospace' }}>{dMind}</span>
+              <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53' }}>{dMind}</span>
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
 
@@ -84,14 +96,14 @@ export default async function handler(req) {
               ].map((row, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', color: '#7a6b53', padding: '4px 0' }}>
                   <span style={{ width: '100px', fontWeight: 'bold' }}>{row.label}</span>
-                  <span style={{ width: '150px', textAlign: 'center', fontFamily: 'monospace' }}>{row.val}</span>
-                  <span style={{ width: '120px', textAlign: 'right', fontWeight: 'bold', fontFamily: 'monospace' }}>{row.total}</span>
+                  <span style={{ width: '150px', textAlign: 'center' }}>{row.val}</span>
+                  <span style={{ width: '120px', textAlign: 'right', fontWeight: 'bold' }}>{row.total}</span>
                 </div>
               ))}
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
 
-            {/* 어빌리티/마법/스킬 (줄바꿈 자동 대응) */}
+            {/* 어빌리티/마법/스킬 */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', opacity: 0.8 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dAbility}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dMagic}</span></div>
@@ -100,7 +112,17 @@ export default async function handler(req) {
           </div>
         </div>
       ),
-      { width: 600, height: 780 }
+      {
+        width: 600,
+        height: 780,
+        fonts: [
+          {
+            name: 'Pretendard',
+            data: fontData,
+            style: 'normal',
+          },
+        ],
+      }
     );
   } catch (e) {
     return new Response(`Failed to generate image`, { status: 500 });
