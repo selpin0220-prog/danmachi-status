@@ -8,7 +8,7 @@ export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
     
-    // 비브르챗을 속이기 위해 슬래시 경로로 들어온 순서대로 데이터를 쏙쏙 뽑아옵니다.
+    // 비브르챗 필터를 우회하기 위해 주소창에서 언더바로 넘어온 데이터들을 파싱합니다.
     const name = searchParams.get('name') || '유저';
     const race = searchParams.get('race') || '인간';
     const level = searchParams.get('level') || '0';
@@ -28,15 +28,29 @@ export default async function handler(req) {
     const magic = searchParams.get('magic') || '발현된 마법 없음';
     const skill = searchParams.get('skill') || '발현된 스킬 없음';
 
+    // 화면 출력 시 주소창의 언더바(_)를 다시 보기 좋은 공백이나 쉼표로 복원합니다.
+    const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
+    const dName = decodeURIComponent(name).replace(/_/g, ' ');
+    const dRace = decodeURIComponent(race).replace(/_/g, ' ');
+    const dMind = decodeURIComponent(mind).replace(/_/g, ' ');
+    const dStr = decodeURIComponent(str).replace(/_/g, ' ');
+    const dEnd = decodeURIComponent(end).replace(/_/g, ' ');
+    const dDex = decodeURIComponent(dex).replace(/_/g, ' ');
+    const dAgi = decodeURIComponent(agi).replace(/_/g, ' ');
+    const dMag = decodeURIComponent(mag).replace(/_/g, ' ');
+    const dAbility = decodeURIComponent(ability).replace(/_/g, ', ');
+    const dMagic = decodeURIComponent(magic).replace(/_/g, ', ');
+    const dSkill = decodeURIComponent(skill).replace(/_/g, ', ');
+
     return new ImageResponse(
       (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '40px', backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '520px', height: '700px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'sans-serif' }}>
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {familia} &gt;</span>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {dFamilia} &gt;</span>
               <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
-                <span style={{ fontSize: '26px', fontWeight: 'bold', color: '#7a6b53' }}>{name}</span>
-                <span style={{ fontSize: '16px', color: '#8a6f27', marginLeft: '10px' }}>[종족: {race}]</span>
+                <span style={{ fontSize: '26px', fontWeight: 'bold', color: '#7a6b53' }}>{dName}</span>
+                <span style={{ fontSize: '16px', color: '#8a6f27', marginLeft: '10px' }}>[종족: {dRace}]</span>
               </div>
               <div style={{ position: 'absolute', right: '30px', top: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '80px', padding: '5px', border: '2px solid #8a6f27', borderRadius: '4px' }}>
                 <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#8a6f27' }}>레벨</span>
@@ -46,7 +60,7 @@ export default async function handler(req) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#7a6b53' }}>정신력 (마인드)</span>
-              <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53', fontFamily: 'monospace' }}>{mind}</span>
+              <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53', fontFamily: 'monospace' }}>{dMind}</span>
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
@@ -57,11 +71,11 @@ export default async function handler(req) {
               </div>
               <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginBottom: '10px' }} />
               {[
-                { label: '힘', val: str, total: tStr },
-                { label: '내구', val: end, total: tEnd },
-                { label: '기교', val: dex, total: tDex },
-                { label: '민첩', val: agi, total: tAgi },
-                { label: '마력', val: mag, total: tMag },
+                { label: '힘', val: dStr, total: tStr },
+                { label: '내구', val: dEnd, total: tEnd },
+                { label: '기교', val: dDex, total: tDex },
+                { label: '민첩', val: dAgi, total: tAgi },
+                { label: '마력', val: dMag, total: tMag },
               ].map((row, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', color: '#7a6b53', padding: '4px 0' }}>
                   <span style={{ width: '100px', fontWeight: 'bold' }}>{row.label}</span>
@@ -72,9 +86,9 @@ export default async function handler(req) {
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', opacity: 0.8 }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{ability}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{magic}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 스킬</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{skill}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dAbility}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dMagic}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 스킬</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dSkill}</span></div>
             </div>
           </div>
         </div>
