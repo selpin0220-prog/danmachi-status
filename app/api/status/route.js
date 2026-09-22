@@ -11,33 +11,43 @@ async function loadFont() {
   return await res.arrayBuffer();
 }
 
-export async function GET(req, context) {
+export async function GET(req) {
   try {
-    // Catch-all 파라미터에서 배열을 안전하게 가져옵니다.
-    const params = await context.params;
-    const statusArray = params.status || [];
+    // 404 문제를 원천 차단하기 위해 전체 URL 경로를 직접 가져와서 슬래시로 쪼갭니다.
+    const { pathname } = new URL(req.url); 
+    const segments = pathname.split('/').filter(Boolean);
+    
+    // segments 배열의 예시: ['api', 'status', '리츠97', '휴먼', ...]
+    // 'api'와 'status' 뒤에 붙은 순수 데이터 배열만 잘라냅니다.
+    const data = segments.slice(2);
 
-    // 슬래시(/) 단위로 들어온 값들을 순서대로 매핑합니다.
-    const name     = statusArray[0] ? decodeURIComponent(statusArray[0]) : '유저';
-    const race     = statusArray[1] ? decodeURIComponent(statusArray[1]) : '인간';
-    const level    = statusArray[2] ? decodeURIComponent(statusArray[2]) : '0';
-    const familia  = statusArray[3] ? decodeURIComponent(statusArray[3]) : '소속_패밀리아_없음';
-    const mind     = statusArray[4] ? decodeURIComponent(statusArray[4]) : '0_/_0';
-    const str      = statusArray[5] ? decodeURIComponent(statusArray[5]) : '-_0';
-    const end      = statusArray[6] ? decodeURIComponent(statusArray[6]) : '-_0';
-    const dex      = statusArray[7] ? decodeURIComponent(statusArray[7]) : '-_0';
-    const agi      = statusArray[8] ? decodeURIComponent(statusArray[8]) : '-_0';
-    const mag      = statusArray[9] ? decodeURIComponent(statusArray[9]) : '-_0';
-    const tStr     = statusArray[10] ? decodeURIComponent(statusArray[10]) : '0';
-    const tEnd     = statusArray[11] ? decodeURIComponent(statusArray[11]) : '0';
-    const tDex     = statusArray[12] ? decodeURIComponent(statusArray[12]) : '0';
-    const tAgi     = statusArray[13] ? decodeURIComponent(statusArray[13]) : '0';
-    const tMag     = statusArray[14] ? decodeURIComponent(statusArray[14]) : '0';
-    const ability  = statusArray[15] ? decodeURIComponent(statusArray[15]) : '획득한_어빌리티_없음';
-    const magic    = statusArray[16] ? decodeURIComponent(statusArray[16]) : '발현된_마법_없음';
-    const skill    = statusArray[17] ? decodeURIComponent(statusArray[17]) : '발현된_스킬_없음';
+    // 순서대로 값을 매핑하고, 값이 비어있을 경우 안전한 기본값으로 대체합니다.
+    const name     = data[0] ? decodeURIComponent(data[0]) : '유저';
+    const race     = data[1] ? decodeURIComponent(data[1]) : '인간';
+    const level    = data[2] ? decodeURIComponent(data[2]) : '0';
+    const familia  = data[3] ? decodeURIComponent(data[3]) : '소속_패밀리아_없음';
+    const mind     = data[4] ? decodeURIComponent(data[4]) : '0_/_0';
+    const str      = data[5] ? decodeURIComponent(data[5]) : '-_0';
+    const end      = data[6] ? decodeURIComponent(data[6]) : '-_0';
+    const dex      = data[7] ? decodeURIComponent(data[7]) : '-_0';
+    const agi      = data[8] ? decodeURIComponent(data[8]) : '-_0';
+    const mag      = data[9] ? decodeURIComponent(data[9]) : '-_0';
+    const tStr     = data[10] ? decodeURIComponent(data[10]) : '0';
+    const tEnd     = data[11] ? decodeURIComponent(data[11]) : '0';
+    const tDex     = data[12] ? decodeURIComponent(data[12]) : '0';
+    const tAgi     = data[13] ? decodeURIComponent(data[13]) : '0';
+    const tMag     = data[14] ? decodeURIComponent(data[14]) : '0';
+    const ability  = data[15] ? decodeURIComponent(data[15]) : '획득한_어빌리티_없음';
+    const magic    = data[16] ? decodeURIComponent(data[16]) : '발현된_마법_없음';
+    
+    // 맨 끝에 붙는 card.png를 제거하고 순수 스킬 이름만 추출
+    let rawSkill = data[17] ? decodeURIComponent(data[17]) : '발현된_스킬_없음';
+    if (rawSkill.endsWith('.png')) {
+      rawSkill = rawSkill.replace(/\/[^/]+\$/, '').replace('.png', '');
+    }
+    const skill = rawSkill;
 
-    // 화면 출력을 위해 언더바(_) 기호를 자연스러운 공백 및 쉼표로 변환
+    // 언더바(_) 기호를 자연스러운 화면 출력용 문자로 변환
     const dFamilia = familia.replace(/_/g, ' ');
     const dName = name.replace(/_/g, ' ');
     const dRace = race.replace(/_/g, ' ');
@@ -57,7 +67,7 @@ export async function GET(req, context) {
       (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '540px', height: '740px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'Pretendard' }}>
-            {/* 상단 프로필 영역 */}
+            {/* 상단 프로필 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {dFamilia} &gt;</span>
               <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
@@ -71,14 +81,14 @@ export async function GET(req, context) {
               <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginTop: '15px' }} />
             </div>
 
-            {/* 마인드 영역 */}
+            {/* 마인드 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#7a6b53' }}>정신력 (마인드)</span>
               <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53' }}>{dMind}</span>
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
 
-            {/* 스탯 리스트 영역 */}
+            {/* 능력치 리스트 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold', color: '#8a6f27', marginBottom: '5px' }}>
                 <span style={{ width: '100px' }}>기본 능력치</span>
@@ -102,7 +112,7 @@ export async function GET(req, context) {
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
 
-            {/* 스킬 및 어빌리티 영역 */}
+            {/* 어빌리티/마법/스킬 */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', opacity: 0.8 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dAbility}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dMagic}</span></div>
