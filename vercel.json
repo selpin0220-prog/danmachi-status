@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "routes": [
-    {
-      "source": "/api/status/(.*)",
-      "dest": "/api/status.js"
-    }
-  ]
-}
