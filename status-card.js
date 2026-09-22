@@ -4,11 +4,11 @@ export const config = {
   runtime: 'edge',
 };
 
-// 바베챗의 특수 검열 필터를 무력화하기 위해 슬래시 경로 데이터를 1:1로 매칭하는 완전한 백엔드 엔진입니다.
 export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
     
+    // 바베챗 보안 필터를 우회하기 위해 슬래시 경로에서 자동 변환된 값들을 파싱합니다.
     const name = searchParams.get('name') || '유저';
     const race = searchParams.get('race') || '인간';
     const level = searchParams.get('level') || '0';
@@ -28,7 +28,7 @@ export default async function handler(req) {
     const magic = searchParams.get('magic') || '발현된 마법 없음';
     const skill = searchParams.get('skill') || '발현된 스킬 없음';
 
-    // 주소창의 언더바(_) 기호를 화면 출력 시 공백(띄어쓰기)으로 깔끔하게 디코딩 복원합니다.
+    // 주소창의 언더바(_) 기호를 화면 출력 시 부드러운 공백과 쉼표로 자동 복원합니다.
     const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
     const dName = decodeURIComponent(name).replace(/_/g, ' ');
     const dRace = decodeURIComponent(race).replace(/_/g, ' ');
@@ -46,6 +46,7 @@ export default async function handler(req) {
       (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '40px', backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '520px', height: '700px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'sans-serif' }}>
+            {/* 상단 프로필 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {dFamilia} &gt;</span>
               <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
@@ -58,11 +59,15 @@ export default async function handler(req) {
               </div>
               <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginTop: '15px' }} />
             </div>
+
+            {/* 마인드 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#7a6b53' }}>정신력 (마인드)</span>
               <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53', fontFamily: 'monospace' }}>{dMind}</span>
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
+
+            {/* 능력치 리스트 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold', color: '#8a6f27', marginBottom: '5px' }}>
                 <span style={{ width: '100px' }}>기본 능력치</span>
@@ -85,7 +90,9 @@ export default async function handler(req) {
               ))}
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', opacity: 0.8 }}>
+
+            {/* 어빌리티/마법/스킬 (줄바꿈 자동 대응) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', opacity: 0.8 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dAbility}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dMagic}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 스킬</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dSkill}</span></div>
