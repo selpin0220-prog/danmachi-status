@@ -8,7 +8,7 @@ export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
     
-    // 비브르챗 필터를 우회하기 위해 한글 파라미터를 안전하게 해독합니다.
+    // 비브르챗을 속이기 위해 슬래시 경로로 들어온 순서대로 데이터를 쏙쏙 뽑아옵니다.
     const name = searchParams.get('name') || '유저';
     const race = searchParams.get('race') || '인간';
     const level = searchParams.get('level') || '0';
@@ -30,7 +30,7 @@ export default async function handler(req) {
 
     return new ImageResponse(
       (
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '40px', backgroundColor: '#222', justifyContent: 'center', alignHeight: 'center', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '40px', backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '520px', height: '700px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'sans-serif' }}>
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {familia} &gt;</span>
