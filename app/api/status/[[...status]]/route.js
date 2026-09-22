@@ -1,50 +1,40 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = {
-  runtime: 'edge',
-};
+export const config = { runtime: 'edge' };
+// Dynamic API 작동 보장 규칙 추가
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 async function loadFont() {
-  const res = await fetch(
-    new URL('https://jsdelivr.net')
-  );
-  if (!res.ok) throw new Error('Failed to load font');
+  const res = await fetch(new URL('https://jsdelivr.net'));
   return await res.arrayBuffer();
 }
 
-export default async function handler(req) {
+export async function GET(req, { params }) {
   try {
-    const { searchParams } = new URL(req.url);
-    
-    // URL 경로를 슬래시(/) 단위로 쪼개어 배열로 만듭니다.
-    // 예: /api/status/이름/종족/... -> ['api', 'status', '이름', '종족', ...]
-    const pathname = new URL(req.url).pathname;
-    const pathSegments = pathname.split('/').filter(Boolean);
-    
-    // 앞의 ['api', 'status']를 제외한 순수 파라미터 배열 추출
-    const params = pathSegments.slice(2);
+    // 슬래시로 쪼개진 인자들을 배열로 받아옵니다.
+    const resolvedParams = await params;
+    const statusArray = resolvedParams.status || [];
 
-    // 슬래시 순서대로 변수를 안전하게 매핑 (값이 없으면 기본값 적용)
-    const name     = params[0] || '유저';
-    const race     = params[1] || '인간';
-    const level    = params[2] || '0';
-    const familia  = params[3] || '소속_패밀리아_없음';
-    const mind     = params[4] || '0_/_0';
-    const str      = params[5] || '-_0';
-    const end      = params[6] || '-_0';
-    const dex      = params[7] || '-_0';
-    const agi      = params[8] || '-_0';
-    const mag      = params[9] || '-_0';
-    const tStr     = params[10] || '0';
-    const tEnd     = params[11] || '0';
-    const tDex     = params[12] || '0';
-    const tAgi     = params[13] || '0';
-    const tMag     = params[14] || '0';
-    const ability  = params[15] || '획득한_어빌리티_없음';
-    const magic    = params[16] || '발현된_마법_없음';
-    const skill    = params[17] || '발현된_스킬_없음';
+    const name     = statusArray[0] || '유저';
+    const race     = statusArray[1] || '인간';
+    const level    = statusArray[2] || '0';
+    const familia  = statusArray[3] || '소속_패밀리아_없음';
+    const mind     = statusArray[4] || '0_/_0';
+    const str      = statusArray[5] || '-_0';
+    const end      = statusArray[6] || '-_0';
+    const dex      = statusArray[7] || '-_0';
+    const agi      = statusArray[8] || '-_0';
+    const mag      = statusArray[9] || '-_0';
+    const tStr     = statusArray[10] || '0';
+    const tEnd     = statusArray[11] || '0';
+    const tDex     = statusArray[12] || '0';
+    const tAgi     = statusArray[13] || '0';
+    const tMag     = statusArray[14] || '0';
+    const ability  = statusArray[15] || '획득한_어빌리티_없음';
+    const magic    = statusArray[16] || '발현된_마법_없음';
+    const skill    = statusArray[17] || '발현된_스킬_없음';
 
-    // 언더바(_) 기호를 화면 출력용 공백 및 쉼표로 복원
     const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
     const dName = decodeURIComponent(name).replace(/_/g, ' ');
     const dRace = decodeURIComponent(race).replace(/_/g, ' ');
@@ -64,7 +54,6 @@ export default async function handler(req) {
       (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '540px', height: '740px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'Pretendard' }}>
-            {/* 상단 프로필 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {dFamilia} &gt;</span>
               <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
@@ -78,14 +67,12 @@ export default async function handler(req) {
               <div style={{ width: '100%', height: '2px', backgroundColor: '#8a6f27', marginTop: '15px' }} />
             </div>
 
-            {/* 마인드 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#7a6b53' }}>정신력 (마인드)</span>
               <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#7a6b53' }}>{dMind}</span>
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
 
-            {/* 능력치 리스트 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold', color: '#8a6f27', marginBottom: '5px' }}>
                 <span style={{ width: '100px' }}>기본 능력치</span>
@@ -109,7 +96,6 @@ export default async function handler(req) {
             </div>
             <div style={{ width: '100%', height: '1px', borderTop: '1px dashed #8a6f27', marginBottom: '20px' }} />
 
-            {/* 어빌리티/마법/스킬 */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', opacity: 0.8 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 발전 어빌리티</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dAbility}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '13px', fontWeight: 'bold', color: '#8a6f27' }}>■ 마법</span><span style={{ fontSize: '14px', color: '#4a3611', marginTop: '2px' }}>{dMagic}</span></div>
