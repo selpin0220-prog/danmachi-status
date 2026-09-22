@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/status-card"
+      "destination": "/index.html"
     }
   ]
 }
