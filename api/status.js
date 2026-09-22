@@ -1,7 +1,8 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = { runtime: 'edge' };
-export const dynamic = 'force-dynamic';
+export const config = {
+  runtime: 'edge',
+};
 
 async function loadFont() {
   const res = await fetch(
@@ -11,17 +12,16 @@ async function loadFont() {
   return await res.arrayBuffer();
 }
 
-export async function GET(req) {
+export default async function handler(req) {
   try {
-    // 404 문제를 원천 차단하기 위해 전체 URL 경로를 직접 가져와서 슬래시로 쪼갭니다.
     const { pathname } = new URL(req.url); 
+    // 주소를 슬래시(/) 단위로 쪼갭니다.
     const segments = pathname.split('/').filter(Boolean);
     
-    // segments 배열의 예시: ['api', 'status', '리츠97', '휴먼', ...]
-    // 'api'와 'status' 뒤에 붙은 순수 데이터 배열만 잘라냅니다.
+    // api/status 뒤에 붙어오는 데이터 배열을 잘라냅니다.
     const data = segments.slice(2);
 
-    // 순서대로 값을 매핑하고, 값이 비어있을 경우 안전한 기본값으로 대체합니다.
+    // 슬래시 순서대로 데이터 할당 (값이 없는 구간은 안전한 기본값으로 채움)
     const name     = data[0] ? decodeURIComponent(data[0]) : '유저';
     const race     = data[1] ? decodeURIComponent(data[1]) : '인간';
     const level    = data[2] ? decodeURIComponent(data[2]) : '0';
@@ -36,18 +36,15 @@ export async function GET(req) {
     const tEnd     = data[11] ? decodeURIComponent(data[11]) : '0';
     const tDex     = data[12] ? decodeURIComponent(data[12]) : '0';
     const tAgi     = data[13] ? decodeURIComponent(data[13]) : '0';
-    const tMag     = data[14] ? decodeURIComponent(data[14]) : '0';
-    const ability  = data[15] ? decodeURIComponent(data[15]) : '획득한_어빌리티_없음';
-    const magic    = data[16] ? decodeURIComponent(data[16]) : '발현된_마법_없음';
     
-    // 맨 끝에 붙는 card.png를 제거하고 순수 스킬 이름만 추출
-    let rawSkill = data[17] ? decodeURIComponent(data[17]) : '발현된_스킬_없음';
+    // 맨 마지막 항목(스킬)에서 우회용 확장자(.png) 제거 및 디코딩
+    let rawSkill = data[14] ? decodeURIComponent(data[14]) : '발현된_스킬_없음';
     if (rawSkill.endsWith('.png')) {
-      rawSkill = rawSkill.replace(/\/[^/]+\$/, '').replace('.png', '');
+      rawSkill = rawSkill.replace('.png', '');
     }
     const skill = rawSkill;
 
-    // 언더바(_) 기호를 자연스러운 화면 출력용 문자로 변환
+    // 언더바(_) 기호를 자연스러운 공백 및 쉼표 문자로 변환
     const dFamilia = familia.replace(/_/g, ' ');
     const dName = name.replace(/_/g, ' ');
     const dRace = race.replace(/_/g, ' ');
@@ -57,8 +54,9 @@ export async function GET(req) {
     const dDex = dex.replace(/_/g, ' ');
     const dAgi = agi.replace(/_/g, ' ');
     const dMag = mag.replace(/_/g, ' ');
-    const dAbility = ability.replace(/_/g, ', ');
-    const dMagic = magic.replace(/_/g, ', ');
+    // 예외 인자 처리
+    const dAbility = '획득한 어빌리티 없음'; 
+    const dMagic = '발현된 마법 없음';
     const dSkill = skill.replace(/_/g, ', ');
 
     const fontData = await loadFont();
@@ -67,7 +65,7 @@ export async function GET(req) {
       (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '540px', height: '740px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'Pretendard' }}>
-            {/* 상단 프로필 */}
+            {/* 프로필 */}
             <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
               <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#4a3611', letterSpacing: '2px' }}>&lt; {dFamilia} &gt;</span>
               <div style={{ display: 'flex', alignItems: 'baseline', marginTop: '5px' }}>
@@ -101,7 +99,7 @@ export async function GET(req) {
                 { label: '내구', val: dEnd, total: tEnd },
                 { label: '기교', val: dDex, total: tDex },
                 { label: '민첩', val: dAgi, total: tAgi },
-                { label: '마력', val: dMag, total: tMag },
+                { label: '마력', val: dMag, total: '- 0' },
               ].map((row, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', color: '#7a6b53', padding: '4px 0' }}>
                   <span style={{ width: '100px', fontWeight: 'bold' }}>{row.label}</span>
