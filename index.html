@@ -11,7 +11,7 @@
 </head>
 <body>
   <div id="cardContainer">
-    <!-- 바베챗 검열 필터를 무력화하고 실시간 수치를 동적 렌더링하는 순수 SVG 벡터 프레임입니다 -->
+    <!-- Vercel의 경로 주소 오작동을 프론트엔드 레벨에서 완벽하게 우회 치료한 최종 도면 레이아웃입니다 -->
     <svg xmlns="http://w3.org" viewBox="0 0 600 780" id="danmachiCard">
       <defs>
         <linearGradient id="parchment" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -69,38 +69,41 @@
   </div>
 
   <script>
-    function parseHashRoute() {
-      const hash = window.location.hash;
-      if (!hash) return;
-      const routeStr = hash.replace(/^#\/?/, '');
-      const pathSegments = routeStr.split('/').filter(Boolean);
+    // ⚠️ 404 에러를 완벽하게 분쇄하는 무적의 주소 해독 엔진 
+    // 브라우저 주소창 주소와 상관없이 ? 문법을 안정적으로 받아냅니다.
+    function parseQueryRoute() {
+      const urlParams = new URLSearchParams(window.location.search);
       
-      if (pathSegments.length >= 5) {
-        document.getElementById('p-name').textContent = decodeURIComponent(pathSegments[0]).replace(/_/g, ' ');
-        document.getElementById('p-race').textContent = decodeURIComponent(pathSegments[1]).replace(/_/g, ' ');
-        document.getElementById('p-level').textContent = decodeURIComponent(pathSegments[2]).replace(/_/g, ' ');
-        document.getElementById('p-familia').textContent = decodeURIComponent(pathSegments[3]).replace(/_/g, ' ');
-        document.getElementById('p-mind').textContent = decodeURIComponent(pathSegments[4]).replace(/_/g, ' ');
-        
-        if(pathSegments[5]) document.getElementById('p-str').textContent = decodeURIComponent(pathSegments[5]).replace(/_/g, ' ');
-        if(pathSegments[6]) document.getElementById('p-end').textContent = decodeURIComponent(pathSegments[6]).replace(/_/g, ' ');
-        if(pathSegments[7]) document.getElementById('p-dex').textContent = decodeURIComponent(pathSegments[7]).replace(/_/g, ' ');
-        if(pathSegments[8]) document.getElementById('p-agi').textContent = decodeURIComponent(pathSegments[8]).replace(/_/g, ' ');
-        if(pathSegments[9]) document.getElementById('p-mag').textContent = decodeURIComponent(pathSegments[9]).replace(/_/g, ' ');
-        
-        if(pathSegments[10]) document.getElementById('p-tStr').textContent = decodeURIComponent(pathSegments[10]).replace(/_/g, ' ');
-        if(pathSegments[11]) document.getElementById('p-tEnd').textContent = decodeURIComponent(pathSegments[11]).replace(/_/g, ' ');
-        if(pathSegments[12]) document.getElementById('p-tDex').textContent = decodeURIComponent(pathSegments[12]).replace(/_/g, ' ');
-        if(pathSegments[13]) document.getElementById('p-tAgi').textContent = decodeURIComponent(pathSegments[13]).replace(/_/g, ' ');
-        if(pathSegments[14]) document.getElementById('p-tMag').textContent = decodeURIComponent(pathSegments[14]).replace(/_/g, ' ');
-        
-        if(pathSegments[15]) document.getElementById('p-ability').textContent = decodeURIComponent(pathSegments[15]).replace(/_/g, ', ');
-        if(pathSegments[16]) document.getElementById('p-magic').textContent = decodeURIComponent(pathSegments[16]).replace(/_/g, ', ');
-        if(pathSegments[17]) document.getElementById('p-skill').textContent = decodeURIComponent(pathSegments[17]).replace(/_/g, ', ');
+      if (urlParams.has('name') || urlParams.has('level')) {
+        const updateField = (id, paramKey, isList = false) => {
+          if (urlParams.has(paramKey)) {
+            const rawVal = urlParams.get(paramKey);
+            const cleanVal = decodeURIComponent(rawVal).replace(/_/g, ' ');
+            document.getElementById(id).textContent = isList ? cleanVal.replace(/-/g, ', ') : cleanVal;
+          }
+        };
+
+        updateField('p-name', 'name');
+        updateField('p-race', 'race');
+        updateField('p-level', 'level');
+        updateField('p-familia', 'familia');
+        updateField('p-mind', 'mind');
+        updateField('p-str', 'str');
+        updateField('p-end', 'end');
+        updateField('p-dex', 'dex');
+        updateField('p-agi', 'agi');
+        updateField('p-mag', 'mag');
+        updateField('p-tStr', 'tStr');
+        updateField('p-tEnd', 'tEnd');
+        updateField('p-tDex', 'tDex');
+        updateField('p-tAgi', 'tAgi');
+        updateField('p-tMag', 'tMag');
+        updateField('p-ability', 'ability', true);
+        updateField('p-magic', 'magic', true);
+        updateField('p-skill', 'skill', true);
       }
     }
-    window.addEventListener('load', parseHashRoute);
-    window.addEventListener('hashchange', parseHashRoute);
+    window.addEventListener('load', parseQueryRoute);
   </script>
 </body>
 </html>
