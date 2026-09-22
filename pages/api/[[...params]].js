@@ -4,9 +4,7 @@ export const config = {
   runtime: 'edge',
 };
 
-// 폰트 데이터를 가져오는 헬퍼 함수
 async function loadFont() {
-  // 예시로 원활한 한글 출력을 위해 Pretendard 폰트(이진 데이터)를 가져옵니다.
   const res = await fetch(
     new URL('https://jsdelivr.net')
   );
@@ -18,25 +16,35 @@ export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
     
-    const name = searchParams.get('name') || '유저';
-    const race = searchParams.get('race') || '인간';
-    const level = searchParams.get('level') || '0';
-    const familia = searchParams.get('familia') || '소속 패밀리아 없음';
-    const mind = searchParams.get('mind') || '0 / 0';
-    const str = searchParams.get('str') || '- 0';
-    const end = searchParams.get('end') || '- 0';
-    const dex = searchParams.get('dex') || '- 0';
-    const agi = searchParams.get('agi') || '- 0';
-    const mag = searchParams.get('mag') || '- 0';
-    const tStr = searchParams.get('tStr') || '0';
-    const tEnd = searchParams.get('tEnd') || '0';
-    const tDex = searchParams.get('tDex') || '0';
-    const tAgi = searchParams.get('tAgi') || '0';
-    const tMag = searchParams.get('tMag') || '0';
-    const ability = searchParams.get('ability') || '획득한 어빌리티 없음';
-    const magic = searchParams.get('magic') || '발현된 마법 없음';
-    const skill = searchParams.get('skill') || '발현된 스킬 없음';
+    // URL 경로를 슬래시(/) 단위로 쪼개어 배열로 만듭니다.
+    // 예: /api/status/이름/종족/... -> ['api', 'status', '이름', '종족', ...]
+    const pathname = new URL(req.url).pathname;
+    const pathSegments = pathname.split('/').filter(Boolean);
+    
+    // 앞의 ['api', 'status']를 제외한 순수 파라미터 배열 추출
+    const params = pathSegments.slice(2);
 
+    // 슬래시 순서대로 변수를 안전하게 매핑 (값이 없으면 기본값 적용)
+    const name     = params[0] || '유저';
+    const race     = params[1] || '인간';
+    const level    = params[2] || '0';
+    const familia  = params[3] || '소속_패밀리아_없음';
+    const mind     = params[4] || '0_/_0';
+    const str      = params[5] || '-_0';
+    const end      = params[6] || '-_0';
+    const dex      = params[7] || '-_0';
+    const agi      = params[8] || '-_0';
+    const mag      = params[9] || '-_0';
+    const tStr     = params[10] || '0';
+    const tEnd     = params[11] || '0';
+    const tDex     = params[12] || '0';
+    const tAgi     = params[13] || '0';
+    const tMag     = params[14] || '0';
+    const ability  = params[15] || '획득한_어빌리티_없음';
+    const magic    = params[16] || '발현된_마법_없음';
+    const skill    = params[17] || '발현된_스킬_없음';
+
+    // 언더바(_) 기호를 화면 출력용 공백 및 쉼표로 복원
     const dFamilia = decodeURIComponent(familia).replace(/_/g, ' ');
     const dName = decodeURIComponent(name).replace(/_/g, ' ');
     const dRace = decodeURIComponent(race).replace(/_/g, ' ');
@@ -50,12 +58,10 @@ export default async function handler(req) {
     const dMagic = decodeURIComponent(magic).replace(/_/g, ', ');
     const dSkill = decodeURIComponent(skill).replace(/_/g, ', ');
 
-    // 폰트 로드
     const fontData = await loadFont();
 
     return new ImageResponse(
       (
-        // 채팅창 정렬을 위해 불필요한 바깥 회색 배경 제거 및 크기 맞춤
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '540px', height: '740px', padding: '30px', borderRadius: '8px', border: '4px solid #614a1a', background: 'linear-gradient(135deg, #f5edd6 0%, #eadaa6 50%, #ceba7f 100%)', position: 'relative', fontFamily: 'Pretendard' }}>
             {/* 상단 프로필 */}
@@ -115,13 +121,7 @@ export default async function handler(req) {
       {
         width: 600,
         height: 780,
-        fonts: [
-          {
-            name: 'Pretendard',
-            data: fontData,
-            style: 'normal',
-          },
-        ],
+        fonts: [{ name: 'Pretendard', data: fontData, style: 'normal' }],
       }
     );
   } catch (e) {
