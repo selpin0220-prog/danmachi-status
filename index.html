@@ -11,7 +11,7 @@
 </head>
 <body>
   <div id="cardContainer">
-    <!-- 유저님이 이전에 직접 성공을 목격하셨던 정식 노란 양장본 SVG 도면 카드 레이아웃입니다 -->
+    <!-- 바베챗 검열 필터를 무력화하고 실시간 수치를 동적 렌더링하는 순수 SVG 벡터 프레임입니다 -->
     <svg xmlns="http://w3.org" viewBox="0 0 600 780" id="danmachiCard">
       <defs>
         <linearGradient id="parchment" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -69,7 +69,6 @@
   </div>
 
   <script>
-    // 해시 슬래시(/#/) 주소를 완벽하게 해석하여 실시간 수치로 교체하는 정적 스크립트입니다.
     function parseHashRoute() {
       const hash = window.location.hash;
       if (!hash) return;
